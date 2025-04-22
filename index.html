@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Vendas</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8f8; }
+    h1 { color: #333; }
+    label { display: block; margin-top: 10px; }
+    select, input, button { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #eee; }
+    .btn-container { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <h1>Gestão de Vendas</h1>
+  <form id="vendaForm">
+    <label for="data">Data:</label>
+    <input type="date" id="data" required>
+
+    <label for="localizador">Localizador:</label>
+    <input type="text" id="localizador" required>
+
+    <label for="titular">Titular:</label>
+    <select id="titular" required>
+      <option value="NELI">NELI</option>
+      <option value="THUCA">THUCA</option>
+      <option value="FABIULA">FABIULA</option>
+      <option value="FABIANA">FABIANA</option>
+      <option value="HERBERT">HERBERT</option>
+    </select>
+
+    <label for="valorWallet">Valor Wallet (R$):</label>
+    <input type="number" id="valorWallet" required>
+
+    <label for="desagio">Deságio (%):</label>
+    <input type="number" id="desagio" step="0.01" required>
+
+    <label for="emissor">Emissor:</label>
+    <select id="emissor" required>
+      <option value="DANIEL">DANIEL</option>
+      <option value="THUCA">THUCA</option>
+      <option value="HERBERT">HERBERT</option>
+    </select>
+
+    <button type="button" onclick="registrarVenda()">Registrar Venda</button>
+  </form>
+
+  <div class="btn-container">
+    <button onclick="exportarPDF()">Exportar para PDF</button>
+    <button onclick="exportarExcel()">Exportar para Excel</button>
+  </div>
+
+  <h2>Histórico de Vendas</h2>
+  <table id="tabelaVendas">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Localizador</th>
+        <th>Titular</th>
+        <th>Valor Wallet (R$)</th>
+        <th>Deságio (%)</th>
+        <th>Lucro Final (R$)</th>
+        <th>Emissor</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    function registrarVenda() {
+      const data = document.getElementById('data').value;
+      const localizador = document.getElementById('localizador').value;
+      const titular = document.getElementById('titular').value;
+      const valorWallet = parseFloat(document.getElementById('valorWallet').value);
+      const desagio = parseFloat(document.getElementById('desagio').value);
+      const emissor = document.getElementById('emissor').value;
+
+      const lucro = valorWallet - (valorWallet * (desagio / 100));
+
+      const tabela = document.getElementById('tabelaVendas').getElementsByTagName('tbody')[0];
+      const novaLinha = tabela.insertRow();
+
+      novaLinha.insertCell(0).innerText = data;
+      novaLinha.insertCell(1).innerText = localizador;
+      novaLinha.insertCell(2).innerText = titular;
+      novaLinha.insertCell(3).innerText = valorWallet.toFixed(2);
+      novaLinha.insertCell(4).innerText = desagio.toFixed(2);
+      novaLinha.insertCell(5).innerText = lucro.toFixed(2);
+      novaLinha.insertCell(6).innerText = emissor;
+
+      document.getElementById('vendaForm').reset();
+    }
+
+    function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Relatório de Vendas", 10, 10);
+      const tabela = document.getElementById("tabelaVendas");
+      let y = 20;
+      for (let i = 0; i < tabela.rows.length; i++) {
+        const row = tabela.rows[i];
+        let linha = '';
+        for (let j = 0; j < row.cells.length; j++) {
+          linha += row.cells[j].innerText + ' | ';
+        }
+        doc.text(linha, 10, y);
+        y += 10;
+      }
+      doc.save("relatorio_vendas.pdf");
+    }
+
+    function exportarExcel() {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(document.getElementById("tabelaVendas"));
+      XLSX.utils.book_append_sheet(wb, ws, "Relatório");
+      XLSX.writeFile(wb, "relatorio_vendas.xlsx");
+    }
+  </script>
+</body>
+</html>
