@@ -65,14 +65,118 @@
         <th>Valor Wallet (R$)</th>
         <th>Deságio (%)</th>
         <th>Lucro Final (R$)</th>
-        <th>Emissor</th>
+        <th>Emissor</th><th>Ações</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    
+    <tbody id="vendasBody"></tbody>
+    
   </table>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+    let vendas = [];
+
+    function atualizarTabela() {
+      const tbody = document.getElementById('vendasBody');
+      tbody.innerHTML = '';
+      vendas.forEach((venda, index) => {
+        const linha = tbody.insertRow();
+        linha.insertCell(0).innerText = venda.data;
+        linha.insertCell(1).innerText = venda.localizador;
+        linha.insertCell(2).innerText = venda.titular;
+        linha.insertCell(3).innerText = venda.valorWallet.toFixed(2);
+        linha.insertCell(4).innerText = venda.desagio.toFixed(2);
+        linha.insertCell(5).innerText = venda.lucro.toFixed(2);
+        linha.insertCell(6).innerText = venda.emissor;
+        const acoes = linha.insertCell(7);
+        acoes.innerHTML = '<button onclick="editarVenda(' + index + ')">Editar</button> <button onclick="cancelarVenda(' + index + ')">Cancelar</button>';
+      });
+    }
+
+    function registrarVenda() {
+      const data = document.getElementById('data').value;
+      const localizador = document.getElementById('localizador').value;
+      const titular = document.getElementById('titular').value;
+      const valorWallet = parseFloat(document.getElementById('valorWallet').value);
+      const desagio = parseFloat(document.getElementById('desagio').value);
+      const emissor = document.getElementById('emissor').value;
+      const lucro = valorWallet - (valorWallet * (desagio / 100));
+
+      vendas.push({ data, localizador, titular, valorWallet, desagio, lucro, emissor, status: 'Ativo' });
+      atualizarTabela();
+      document.getElementById('vendaForm').reset();
+    }
+
+    function editarVenda(index) {
+      const venda = vendas[index];
+      document.getElementById('data').value = venda.data;
+      document.getElementById('localizador').value = venda.localizador;
+      document.getElementById('titular').value = venda.titular;
+      document.getElementById('valorWallet').value = venda.valorWallet;
+      document.getElementById('desagio').value = venda.desagio;
+      document.getElementById('emissor').value = venda.emissor;
+      vendas.splice(index, 1);
+      atualizarTabela();
+    }
+
+    function cancelarVenda(index) {
+      vendas[index].status = 'Cancelado';
+      vendas[index].lucro = 0;
+      atualizarTabela();
+    }
+    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    let vendas = [];
+
+    function atualizarTabela() {
+      const tbody = document.getElementById('vendasBody');
+      tbody.innerHTML = '';
+      vendas.forEach((venda, index) => {
+        const linha = tbody.insertRow();
+        linha.insertCell(0).innerText = venda.data;
+        linha.insertCell(1).innerText = venda.localizador;
+        linha.insertCell(2).innerText = venda.titular;
+        linha.insertCell(3).innerText = venda.valorWallet.toFixed(2);
+        linha.insertCell(4).innerText = venda.desagio.toFixed(2);
+        linha.insertCell(5).innerText = venda.lucro.toFixed(2);
+        linha.insertCell(6).innerText = venda.emissor;
+        const acoes = linha.insertCell(7);
+        acoes.innerHTML = '<button onclick="editarVenda(' + index + ')">Editar</button> <button onclick="cancelarVenda(' + index + ')">Cancelar</button>';
+      });
+    }
+
+    function registrarVenda() {
+      const data = document.getElementById('data').value;
+      const localizador = document.getElementById('localizador').value;
+      const titular = document.getElementById('titular').value;
+      const valorWallet = parseFloat(document.getElementById('valorWallet').value);
+      const desagio = parseFloat(document.getElementById('desagio').value);
+      const emissor = document.getElementById('emissor').value;
+      const lucro = valorWallet - (valorWallet * (desagio / 100));
+
+      vendas.push({ data, localizador, titular, valorWallet, desagio, lucro, emissor, status: 'Ativo' });
+      atualizarTabela();
+      document.getElementById('vendaForm').reset();
+    }
+
+    function editarVenda(index) {
+      const venda = vendas[index];
+      document.getElementById('data').value = venda.data;
+      document.getElementById('localizador').value = venda.localizador;
+      document.getElementById('titular').value = venda.titular;
+      document.getElementById('valorWallet').value = venda.valorWallet;
+      document.getElementById('desagio').value = venda.desagio;
+      document.getElementById('emissor').value = venda.emissor;
+      vendas.splice(index, 1);
+      atualizarTabela();
+    }
+
+    function cancelarVenda(index) {
+      vendas[index].status = 'Cancelado';
+      vendas[index].lucro = 0;
+      atualizarTabela();
+    }
+    
 
   <script>
     function registrarVenda() {
@@ -123,6 +227,57 @@
       XLSX.utils.book_append_sheet(wb, ws, "Relatório");
       XLSX.writeFile(wb, "relatorio_vendas.xlsx");
     }
-  </script>
+  
+    let vendas = [];
+
+    function atualizarTabela() {
+      const tbody = document.getElementById('vendasBody');
+      tbody.innerHTML = '';
+      vendas.forEach((venda, index) => {
+        const linha = tbody.insertRow();
+        linha.insertCell(0).innerText = venda.data;
+        linha.insertCell(1).innerText = venda.localizador;
+        linha.insertCell(2).innerText = venda.titular;
+        linha.insertCell(3).innerText = venda.valorWallet.toFixed(2);
+        linha.insertCell(4).innerText = venda.desagio.toFixed(2);
+        linha.insertCell(5).innerText = venda.lucro.toFixed(2);
+        linha.insertCell(6).innerText = venda.emissor;
+        const acoes = linha.insertCell(7);
+        acoes.innerHTML = '<button onclick="editarVenda(' + index + ')">Editar</button> <button onclick="cancelarVenda(' + index + ')">Cancelar</button>';
+      });
+    }
+
+    function registrarVenda() {
+      const data = document.getElementById('data').value;
+      const localizador = document.getElementById('localizador').value;
+      const titular = document.getElementById('titular').value;
+      const valorWallet = parseFloat(document.getElementById('valorWallet').value);
+      const desagio = parseFloat(document.getElementById('desagio').value);
+      const emissor = document.getElementById('emissor').value;
+      const lucro = valorWallet - (valorWallet * (desagio / 100));
+
+      vendas.push({ data, localizador, titular, valorWallet, desagio, lucro, emissor, status: 'Ativo' });
+      atualizarTabela();
+      document.getElementById('vendaForm').reset();
+    }
+
+    function editarVenda(index) {
+      const venda = vendas[index];
+      document.getElementById('data').value = venda.data;
+      document.getElementById('localizador').value = venda.localizador;
+      document.getElementById('titular').value = venda.titular;
+      document.getElementById('valorWallet').value = venda.valorWallet;
+      document.getElementById('desagio').value = venda.desagio;
+      document.getElementById('emissor').value = venda.emissor;
+      vendas.splice(index, 1);
+      atualizarTabela();
+    }
+
+    function cancelarVenda(index) {
+      vendas[index].status = 'Cancelado';
+      vendas[index].lucro = 0;
+      atualizarTabela();
+    }
+    
 </body>
 </html>
